@@ -1,5 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Created by rcd18 on 27/01/2016.
@@ -10,6 +14,7 @@ public class Window extends JFrame{
     JLabel score = new JLabel("0");
     JPanel paneLeft;
     JPanel paneRight;
+    private Boule[][] grid = new Boule[8][8];
 
     /**
      * Constructor
@@ -19,8 +24,10 @@ public class Window extends JFrame{
         super();
         setVisible(true);
         this.setLayout(new GridBagLayout());
-
-        this.setMinimumSize(new Dimension(500, 600));
+        // POSITION / TAILLE FENETRE
+        this.setMinimumSize(new Dimension(600, 500));
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 
         // Panel de gauche
         GridBagConstraints leftConstrainte  = new GridBagConstraints();
@@ -65,6 +72,7 @@ public class Window extends JFrame{
 
     public void setScore (int s) {
         this.score.setText( Integer.toString(s) );
+        this.repaint();
     }
 
     public void drawGrid(int[][] matrix) {
@@ -73,8 +81,45 @@ public class Window extends JFrame{
         for(int i = 0; i< matrix.length; i++) {
             for(int j = 0; j< matrix.length; j++) {
 
-                Boule tmp = new Boule(matrix[i][j]);
-                paneLeft.add( tmp.label );
+                grid[i][j] = new Boule(matrix[i][j]);
+
+                paneLeft.add( (grid[i][j]).button );
+
+                // ON APPUIE SUR UNE BOULE
+                (grid[i][j]).button.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        for (int i = 0; i < 8; i++) {
+                            for (int j = 0; j < 8; j++) {
+                                if ((grid[i][j]).button == e.getSource()){
+                                    // On a la Boule en I et J
+                                    System.out.println( grid[i][j].toString() );
+                                }
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        System.out.println( Integer.toString(e.getX()) + ' ' + Integer.toString(e.getY()) );
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+
+                    }
+                });
             }
         }
         this.pack();
@@ -84,7 +129,9 @@ public class Window extends JFrame{
         for(int i = 0; i< matrix.length; i++) {
             for(int j = 0; j< matrix.length; j++) {
 
-                JLabel x = (JLabel) paneLeft.getComponent(i * 8 + j);
+                if( (grid[i][j]).color != matrix[i][j] ){
+                    (grid[i][j]).setColor( matrix[i][j] );
+                }
             }
         }
     }

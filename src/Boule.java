@@ -8,22 +8,35 @@ public class Boule {
     ImageIcon bouleIcon;
     ImageIcon bouleIconHover;
 
-    JLabel label;
-    JLabel labelHover;
+    JButton button;
     int color;
 
     public Boule(int color) {
 
-        bouleIcon  = new ImageIcon(this.getClass().getResource("boule_"+ color +".jpg"));
-        bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ color +".jpg"));
         this.color = color;
-
-        label      = new JLabel(bouleIcon);
-        labelHover = new JLabel(bouleIconHover);
+        this.loadImage();
     }
 
     public void setColor(int newColor){
 
         this.color = newColor;
+        this.loadImage();
+
+        this.button.repaint();
+    }
+    private void loadImage(){
+        // IMAGE
+        bouleIcon  = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
+        bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ this.color +".jpg"));
+        // BUTON
+        button      = new JButton(bouleIcon);
+        // ENLEVE STYLE PAR DEFAULT
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setRolloverEnabled(true);
+        button.setRolloverIcon(bouleIconHover);
+    }
+    public String toString(){
+        return "Boule de couleur " + this.color;
     }
 }
