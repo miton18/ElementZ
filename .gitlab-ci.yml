@@ -1,0 +1,5 @@
+image: java:8
+
+job1:
+    script:
+    - javac src/*
