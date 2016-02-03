@@ -5,10 +5,10 @@ import java.util.Random;
  */
 public class ElementZ_model {
 
-    private static int size     = 8;
-    public int[][] matrix      = new int[size][size];
+    private static int  size    = 8;
+    public int[][]      matrix  = new int[size][size];
     private boolean[][] matrixb = new boolean[size][size];
-    private int score           = 0;
+    private int         score   = 0;
 
     public ElementZ_model(){
         initMatrixb();
@@ -98,6 +98,13 @@ public class ElementZ_model {
                 }
             }
         }
+    }
+
+    public boolean cleanGrid() {
+        detect_ligne();
+        detect_column();
+        delete_famille();
+        return false;
     }
 
     /**

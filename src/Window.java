@@ -16,8 +16,8 @@ public class Window extends JFrame{
     JPanel paneRight;
     private ElementZ_model M;
     private Boule[][] grid = new Boule[8][8];
-    private int[] src = new int[2];
-    private int[] dest=  new int[2];
+    private Pos src = new Pos();
+    private Pos dest=  new Pos();
 
     /**
      * Constructor
@@ -57,6 +57,12 @@ public class Window extends JFrame{
         // BOUTON START
         JButton buttonStart = new JButton("Démarer");
         paneRight.add(buttonStart);
+        buttonStart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawGrid();
+            }
+        });
         buttonStart.setAlignmentX(Component.CENTER_ALIGNMENT);
         // ICON BOULE
         ImageIcon isenIcon  = new ImageIcon(this.getClass().getResource("boule_expo.jpg"));
@@ -101,8 +107,8 @@ public class Window extends JFrame{
                                 if ((grid[i][j]).button == e.getSource()){
                                     // On a la Boule en I et J
                                     //System.out.println( grid[i][j].toString() );
-                                    src[0] = i;
-                                    src[1] = j;
+                                    src.x = i;
+                                    src.y = j;
                                     //System.out.println( "from " + Integer.toString(src[0]) + " " + Integer.toString(src[1]) );
                                 }
 
@@ -122,35 +128,36 @@ public class Window extends JFrame{
                             System.out.print("Hor");
                             if(dx > 0){
                                 System.out.println(" droite");
-                                dest[0] = src[0];
-                                dest[1] = src[1] + 1;
+                                dest.x = src.x;
+                                dest.y = src.y + 1;
                                 //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
-                                M.permut(src[0], src[1], dest[0], dest[1]);
                             }
                             else{
                                 System.out.println(" gauche");
-                                dest[0] = src[0];
-                                dest[1] = src[1] - 1;
+                                dest.x = src.x;
+                                dest.y = src.y - 1;
                                 //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
-                                M.permut(src[0], src[1], dest[0] | -1, dest[1] | -1);
                             }
                         }
                         else if( dyA > dxA && dxA <= seuil ){ // MOUVEMENT Vertical
                             System.out.print("vert");
                             if(dy > 0){
                                 System.out.println(" bas");
-                                dest[0] = src[0] + 1;
-                                dest[1] = src[1];
+                                dest.x = src.x + 1;
+                                dest.y = src.y;
                                 //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
-                                M.permut(src[0], src[1], dest[0], dest[1]);
                             }
                             else{
                                 System.out.println(" haut");
-                                dest[0] = src[0] - 1;
-                                dest[1] = src[1];
+                                dest.x = src.x - 1;
+                                dest.y = src.y;
                                 //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
-                                M.permut(src[0], src[1], dest[0], dest[1]);
                             }
+                        }
+                        if( dest.x >= 0 && dest.y >= 0 && dest.x <= M.getSize() -1 && dest.y <= M.getSize() -1 ) {
+                            M.permut(src.x, src.y, dest.x, dest.y);
+                            updateGrid();
+                            while( M.cleanGrid() ){}
                         }
                     }
                     @Override
@@ -162,6 +169,10 @@ public class Window extends JFrame{
         }
         this.pack();
     }
+
+    /**
+     * Met a jour l'affichage en changant la couleur des boutons
+     */
     public void updateGrid() {
 
         for(int i = 0; i< M.matrix.length; i++) {
@@ -169,8 +180,10 @@ public class Window extends JFrame{
 
                 if( (grid[i][j]).color != M.matrix[i][j] ){
                     (grid[i][j]).setColor( M.matrix[i][j] );
+                    //System.out.println("color updated : " + (grid[i][j]).bouleIcon );
                 }
             }
         }
+        paneLeft.updateUI();
     }
 }

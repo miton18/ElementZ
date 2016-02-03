@@ -5,11 +5,11 @@ import javax.swing.*;
  */
 public class Boule {
 
-    ImageIcon bouleIcon;
-    ImageIcon bouleIconHover;
+    public ImageIcon bouleIcon;
+    public ImageIcon bouleIconHover;
 
-    JButton button;
-    int color;
+    public JButton button;
+    public int color;
 
     public Boule(int color) {
 
@@ -19,17 +19,18 @@ public class Boule {
 
     public void setColor(int newColor){
 
-        this.color = newColor;
-        this.loadImage();
-
-        this.button.repaint();
+        this.color      = newColor;
+        bouleIcon       = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
+        bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ this.color +".jpg"));
+        button.setIcon(bouleIcon);
+        button.setRolloverIcon(bouleIconHover);
     }
     private void loadImage(){
         // IMAGE
-        bouleIcon  = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
+        bouleIcon       = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
         bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ this.color +".jpg"));
         // BUTON
-        button      = new JButton(bouleIcon);
+        button          = new JButton(bouleIcon);
         // ENLEVE STYLE PAR DEFAULT
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
