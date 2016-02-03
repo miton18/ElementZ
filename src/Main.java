@@ -11,11 +11,9 @@ public class Main {
 
         System.out.println("Starting...");
 
-        ElementZ_model M = new ElementZ_model();
-
         Window w = new Window();
 
-        w.drawGrid( M.getMatrix() );
+        w.drawGrid();
 
         System.out.println("Waiting...");
     }

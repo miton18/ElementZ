@@ -6,11 +6,8 @@ import java.util.Random;
 public class ElementZ_model {
 
     private static int size     = 8;
-
-    private int[][] matrix      = new int[size][size];
-
+    public int[][] matrix      = new int[size][size];
     private boolean[][] matrixb = new boolean[size][size];
-
     private int score           = 0;
 
     public ElementZ_model(){
@@ -158,10 +155,13 @@ public class ElementZ_model {
                 ||
                 ((j==jp) && (i==(ip-1)))
                 ) {
-            int s = matrix[i][j];
-            matrix[i][j] = matrix[ip][jp];
-            matrix[ip][jp] = s;
+            if( matrix[ip][jp] >= 0 && matrix[ip][jp] <= this.size ){
+                int s = matrix[i][j];
+                matrix[i][j] = matrix[ip][jp];
+                matrix[ip][jp] = s;
+            }
         }
+        this.printMatrix();
     }
 
 

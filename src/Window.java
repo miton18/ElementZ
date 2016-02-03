@@ -14,7 +14,10 @@ public class Window extends JFrame{
     JLabel score = new JLabel("0");
     JPanel paneLeft;
     JPanel paneRight;
+    private ElementZ_model M;
     private Boule[][] grid = new Boule[8][8];
+    private int[] src = new int[2];
+    private int[] dest=  new int[2];
 
     /**
      * Constructor
@@ -38,11 +41,12 @@ public class Window extends JFrame{
         paneLeft  = new JPanel();
         paneLeft.setBackground(Color.black);
         this.add(paneLeft,  leftConstrainte);
+        paneLeft.setLayout(new GridLayout( ElementZ_model.getSize() , ElementZ_model.getSize(), -20, -20) );
 
         //Panel de droite
         GridBagConstraints rightConstrainte = new GridBagConstraints();
         rightConstrainte.gridx      = 1;
-        rightConstrainte.weightx    = 5;
+        rightConstrainte.weightx    = 10;
         rightConstrainte.weighty    = 1;
         rightConstrainte.fill       = GridBagConstraints.BOTH;
         paneRight = new JPanel();
@@ -75,62 +79,96 @@ public class Window extends JFrame{
         this.repaint();
     }
 
-    public void drawGrid(int[][] matrix) {
-        paneLeft.setLayout(new GridLayout( ElementZ_model.getSize() , ElementZ_model.getSize(), 8, 8) );
+    public void drawGrid() {
 
-        for(int i = 0; i< matrix.length; i++) {
-            for(int j = 0; j< matrix.length; j++) {
+        M = new ElementZ_model();
 
-                grid[i][j] = new Boule(matrix[i][j]);
+        for(int i = 0; i< M.matrix.length; i++) {
+            for(int j = 0; j< M.matrix.length; j++) {
+
+                grid[i][j] = new Boule(M.matrix[i][j]);
 
                 paneLeft.add( (grid[i][j]).button );
 
                 // ON APPUIE SUR UNE BOULE
                 (grid[i][j]).button.addMouseListener(new MouseListener() {
                     @Override
-                    public void mouseClicked(MouseEvent e) {
-
-                    }
-
+                    public void mouseClicked(MouseEvent e) {}
                     @Override
                     public void mousePressed(MouseEvent e) {
                         for (int i = 0; i < 8; i++) {
                             for (int j = 0; j < 8; j++) {
                                 if ((grid[i][j]).button == e.getSource()){
                                     // On a la Boule en I et J
-                                    System.out.println( grid[i][j].toString() );
+                                    //System.out.println( grid[i][j].toString() );
+                                    src[0] = i;
+                                    src[1] = j;
+                                    //System.out.println( "from " + Integer.toString(src[0]) + " " + Integer.toString(src[1]) );
                                 }
 
                             }
                         }
                     }
-
                     @Override
                     public void mouseReleased(MouseEvent e) {
-                        System.out.println( Integer.toString(e.getX()) + ' ' + Integer.toString(e.getY()) );
-                    }
+                        int dx      = e.getX() -42;
+                        int dy      = e.getY() -32;
+                        int dxA     = Math.abs(dx) ;
+                        int dyA     = Math.abs(dy);
+                        int seuil   = 40;
 
+                        //System.out.println( Integer.toString(dx) + ' ' + Integer.toString(dy) );
+                        if( dxA > dyA && dyA <= seuil ){ // MOUVEMENT Horizontal
+                            System.out.print("Hor");
+                            if(dx > 0){
+                                System.out.println(" droite");
+                                dest[0] = src[0];
+                                dest[1] = src[1] + 1;
+                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
+                                M.permut(src[0], src[1], dest[0], dest[1]);
+                            }
+                            else{
+                                System.out.println(" gauche");
+                                dest[0] = src[0];
+                                dest[1] = src[1] - 1;
+                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
+                                M.permut(src[0], src[1], dest[0] | -1, dest[1] | -1);
+                            }
+                        }
+                        else if( dyA > dxA && dxA <= seuil ){ // MOUVEMENT Vertical
+                            System.out.print("vert");
+                            if(dy > 0){
+                                System.out.println(" bas");
+                                dest[0] = src[0] + 1;
+                                dest[1] = src[1];
+                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
+                                M.permut(src[0], src[1], dest[0], dest[1]);
+                            }
+                            else{
+                                System.out.println(" haut");
+                                dest[0] = src[0] - 1;
+                                dest[1] = src[1];
+                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
+                                M.permut(src[0], src[1], dest[0], dest[1]);
+                            }
+                        }
+                    }
                     @Override
-                    public void mouseEntered(MouseEvent e) {
-
-                    }
-
+                    public void mouseEntered(MouseEvent e) {}
                     @Override
-                    public void mouseExited(MouseEvent e) {
-
-                    }
+                    public void mouseExited(MouseEvent e) {}
                 });
             }
         }
         this.pack();
     }
-    public void updateGrid(int[][] matrix) {
+    public void updateGrid() {
 
-        for(int i = 0; i< matrix.length; i++) {
-            for(int j = 0; j< matrix.length; j++) {
+        for(int i = 0; i< M.matrix.length; i++) {
+            for(int j = 0; j< M.matrix.length; j++) {
 
-                if( (grid[i][j]).color != matrix[i][j] ){
-                    (grid[i][j]).setColor( matrix[i][j] );
+                if( (grid[i][j]).color != M.matrix[i][j] ){
+                    (grid[i][j]).setColor( M.matrix[i][j] );
                 }
             }
         }
