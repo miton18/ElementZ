@@ -6,23 +6,35 @@ import java.util.Observable;
 public class Score extends Observable {
 
     private int score;
-
+    private int coups;
     private static Score inst;
 
     public Score(){
         this.reset();
     }
-
     public void reset(){
         this.score = 0;
+        this.coups = 0;
     }
-
+    public String getScore(){
+        return Integer.toString( this.score );
+    }
+    public String getCoups(){
+        return Integer.toString( this.coups );
+    }
+    public String getRatio(){
+        if(this.coups == 0) {
+            return "0 %";
+        }
+        else{
+            return Integer.toString( this.score / this.coups ) + " %";
+        }
+    }
     public void inc(int n) {
         this.score += (n-2)*10;
     }
-
-    public String getScore(){
-        return Integer.toString( this.score );
+    public void coup(){
+        this.coups ++;
     }
 
     public static Score getInstance(){

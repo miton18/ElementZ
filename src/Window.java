@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,10 +12,12 @@ import java.awt.event.MouseListener;
 public class Window extends JFrame{
 
     JLabel score = new JLabel("0");
+    JLabel coups = new JLabel("0");
+    JLabel ratio = new JLabel("0");
     JPanel paneLeft;
     JPanel paneRight;
     private ElementZ_model M;
-    private Boule[][] grid = new Boule[8][8];
+    private Boule[][] grid = new Boule[ M.getSize() ][ M.getSize() ];
     private Pos src = new Pos();
     private Pos dest=  new Pos();
 
@@ -41,6 +44,7 @@ public class Window extends JFrame{
         paneLeft                = new JPanel();
         paneLeft.setBackground( Color.black );
         paneLeft.setLayout( new GridLayout( ElementZ_model.getSize() , ElementZ_model.getSize(), -20, -20) );
+        paneLeft.setBorder(new EmptyBorder(0, 10, 10, 10));
         this.add( paneLeft,  leftConstrainte );
 
         // PANEL DE DROITE
@@ -52,6 +56,7 @@ public class Window extends JFrame{
         paneRight                           = new JPanel();
         paneRight.setBackground( Color.orange );
         paneRight.setLayout( new BoxLayout(paneRight, BoxLayout.Y_AXIS) );
+        paneRight.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.add( paneRight, rightConstrainte );
 
         // BOUTON START
@@ -78,6 +83,21 @@ public class Window extends JFrame{
 
         // SCORE VALUE
         paneRight.add(this.score);
+
+        // COUPS TEXT
+        JLabel coupsText = new JLabel("Coups :");
+        paneRight.add(coupsText);
+
+        // COUPS VALUE
+        paneRight.add(this.coups);
+
+        // COUPS TEXT
+        JLabel ratioText = new JLabel("Ratio :");
+        paneRight.add(ratioText);
+
+        // COUPS VALUE
+        paneRight.add(this.ratio);
+
 
         this.pack();
     }
@@ -149,6 +169,7 @@ public class Window extends JFrame{
                         }
                         if( dest.x >= 0 && dest.y >= 0 && dest.x <= M.getSize() -1 && dest.y <= M.getSize() -1 ) {
 
+                            Score.getInstance().coup(); // incremente coups
                             M.permut(src.x, src.y, dest.x, dest.y);
                             updateGrid();
                             M.detect(); // marque en booleen les familles
@@ -192,6 +213,8 @@ public class Window extends JFrame{
     }
     private void updateScore(){
         this.score.setText( (Score.getInstance()).getScore() );
+        this.coups.setText( (Score.getInstance()).getCoups() );
+        this.ratio.setText( (Score.getInstance()).getRatio() );
         this.score.updateUI();
     }
 }

@@ -13,7 +13,11 @@ public class ElementZ_model {
     public ElementZ_model(){
         initMatrixb();
         printMatrix();
-
+    }
+    public ElementZ_model(int s){
+        initMatrixb();
+        printMatrix();
+        this.setSize(s);
     }
 
     private void initMatrixb() {
