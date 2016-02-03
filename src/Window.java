@@ -26,7 +26,7 @@ public class Window extends JFrame{
      */
     public Window() {
 
-        super();
+        super()
         setVisible( true );
         this.setLayout( new GridBagLayout() );
 
