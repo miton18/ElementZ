@@ -1,0 +1,5 @@
+configuration: Build
+
+build:
+    verbosity: maximal
+    publish_wap: true

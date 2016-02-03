@@ -1,5 +1,5 @@
 image: java:8
 
-job1:
+build:
     script:
     - javac src/*
