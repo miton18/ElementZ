@@ -8,7 +8,7 @@ public class ElementZ_model {
     private static int  size    = 8;
     public int[][]      matrix  = new int[size][size];
     private boolean[][] matrixb = new boolean[size][size];
-    private int         score   = 0;
+    private int         score;
 
     public ElementZ_model(){
         initMatrixb();
@@ -17,6 +17,9 @@ public class ElementZ_model {
     }
 
     private void initMatrixb() {
+
+        this.score = 0;
+
         for(int i=0; i<this.size; i++) {
             for(int j=0; j<this.size; j++) {
                 if(matrix[i][j] == 0) {
@@ -29,82 +32,71 @@ public class ElementZ_model {
     /**
      * Detecte et supprime les familles de 4 boules ou plus en ligne
      */
-    private boolean detect_ligne() {
-
-        for( int i=0; i<this.size; i++ ) {
-
-            int count = 0;
-
-            for( int j=0; j< this.size; j++ ) { // parcours de la grille
-
-                int x = 0;
-                while(matrix[i][j] == matrix[i][j+x] ){
-                    count ++;
-                    x ++;
+    public void detectLine(int n) {
+        for(int i=0; i<this.size; i++) {
+            for(int j=0; j<(this.size -n+1); j++) {
+                boolean lineOk = true;
+                int first = matrix[i][j];
+                int k = j;
+                while(k<j+n && lineOk) {
+                    if (matrix[i][k] != first && matrix[i][k]!=0) lineOk = false;
+                    k++;
                 }
-                if( count >= 4 ) {
-                    for( int v=0; v<count; v++ ) {
-                        matrixb[i][j+v] = true;
-                    }
-                    delete_famille();
-                    gravity();
-                    return true;
+                if (lineOk) {
+                    for (k=j; k<(j+n);k++) matrixb[i][k]=true;
+                    j+=n+1;
+                    (Score.getInstance()).inc(n); // envoi la famille pour comptabilisation
                 }
-                count = 0;
             }
         }
-        return false;
     }
 
     /**
      * Detecte et supprime les familles de 4 boules ou plus en colonne
      */
-    private boolean detect_column() {
-
-        for( int i=0; i<this.size; i++ ) {
-
-            int count = 0;
-
-            for( int j=0; j< this.size; j++ ) { // parcours de la grille
-
-                int x = 0;
-                while(matrix[j][i] == matrix[j][i+x] ){
-                    count ++;
-                    x ++;
+    public void detectCol(int n) {
+        for(int i=0; i<this.size; i++) {
+            for(int j=0; j<(this.size-n+1); j++) {
+                boolean lineOk = true;
+                int first = matrix[j][i];
+                int k = j;
+                while(k<j+n && lineOk) {
+                    if (matrix[k][i] != first && matrix[k][i]!=0) lineOk = false;
+                    k++;
                 }
-                if( count >= 4 ) { // on a une bonne famille
-                    for( int v=0; v<count; v++ ) {
-                        matrixb[j][i+v] = true;
-                    }
-                    delete_famille(); // on enleve
-                    gravity(); // on fait descendre
-                    return true;
+                if (lineOk) {
+                    for (k=j; k<(j+n);k++) matrixb[k][i]=true;
+                    j+=n+1;
+                    (Score.getInstance()).inc(n); // envoi la famille pour comptabilisation
                 }
-                count = 0;
             }
         }
-        return false;
     }
 
     /**
      * Remplace les boules à 'true' par 0
      */
-    private void delete_famille() {
+    public boolean delete_famille() {
+        boolean ret = false;
+
         for(int i=0; i<this.size; i++) {
             for(int j=0; j<this.size; j++) {
                 if( matrixb[i][j] ) {
                     matrix[i][j] = 0;
                     matrixb[i][j] = false;
+                    ret = true;
                 }
             }
         }
+        return ret;
     }
 
-    public boolean cleanGrid() {
-        detect_ligne();
-        detect_column();
-        delete_famille();
-        return false;
+    public void detect() {
+
+        for (int i=(this.size)-1; i>2; i--) {
+            detectCol(i);
+            detectLine(i);
+        }
     }
 
     /**
@@ -171,6 +163,27 @@ public class ElementZ_model {
         this.printMatrix();
     }
 
+    public void remplir() {
+        for(int i=0; i<this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if( matrix[i][j] == 0 ) {
+                    matrix[i][j] = randomBall();
+                }
+            }
+        }
+    }
+
+    public boolean hasToClean(){
+        boolean ret = false;
+        for(int i=0; i<this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if( matrixb[i][j] ) {
+                    ret = true;
+                }
+            }
+        }
+        return ret;
+    }
 
     /**
      * Renvoie la grille de boule

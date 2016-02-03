@@ -10,7 +10,6 @@ import java.awt.event.MouseListener;
  */
 public class Window extends JFrame{
 
-
     JLabel score = new JLabel("0");
     JPanel paneLeft;
     JPanel paneRight;
@@ -25,75 +24,81 @@ public class Window extends JFrame{
     public Window() {
 
         super();
-        setVisible(true);
-        this.setLayout(new GridBagLayout());
+        setVisible( true );
+        this.setLayout( new GridBagLayout() );
+
         // POSITION / TAILLE FENETRE
-        this.setMinimumSize(new Dimension(600, 500));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setMinimumSize(new Dimension(600, 500));
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 
-        // Panel de gauche
+        // PANEL DE GAUCHE
         GridBagConstraints leftConstrainte  = new GridBagConstraints();
         leftConstrainte.gridx   = 0;  //position plus a gauche
         leftConstrainte.weightx = 10; // nb de colonnes
         leftConstrainte.weighty = 1;
         leftConstrainte.fill    = GridBagConstraints.BOTH;
-        paneLeft  = new JPanel();
-        paneLeft.setBackground(Color.black);
-        this.add(paneLeft,  leftConstrainte);
-        paneLeft.setLayout(new GridLayout( ElementZ_model.getSize() , ElementZ_model.getSize(), -20, -20) );
+        paneLeft                = new JPanel();
+        paneLeft.setBackground( Color.black );
+        paneLeft.setLayout( new GridLayout( ElementZ_model.getSize() , ElementZ_model.getSize(), -20, -20) );
+        this.add( paneLeft,  leftConstrainte );
 
-        //Panel de droite
+        // PANEL DE DROITE
         GridBagConstraints rightConstrainte = new GridBagConstraints();
-        rightConstrainte.gridx      = 1;
-        rightConstrainte.weightx    = 10;
-        rightConstrainte.weighty    = 1;
-        rightConstrainte.fill       = GridBagConstraints.BOTH;
-        paneRight = new JPanel();
-        paneRight.setBackground(Color.orange);
-        this.add(paneRight, rightConstrainte);
+        rightConstrainte.gridx              = 1;
+        rightConstrainte.weightx            = 10;
+        rightConstrainte.weighty            = 10;
+        rightConstrainte.fill               = GridBagConstraints.BOTH;
+        paneRight                           = new JPanel();
+        paneRight.setBackground( Color.orange );
+        paneRight.setLayout( new BoxLayout(paneRight, BoxLayout.Y_AXIS) );
+        this.add( paneRight, rightConstrainte );
 
-        paneRight.setLayout(new BoxLayout(paneRight, BoxLayout.Y_AXIS));
         // BOUTON START
         JButton buttonStart = new JButton("Démarer");
-        paneRight.add(buttonStart);
         buttonStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawGrid();
             }
         });
-        buttonStart.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonStart.setAlignmentX( Component.CENTER_ALIGNMENT );
+        //buttonStart.
+        paneRight.add( buttonStart );
+
         // ICON BOULE
-        ImageIcon isenIcon  = new ImageIcon(this.getClass().getResource("boule_expo.jpg"));
-        JLabel isen         = new JLabel(isenIcon);
-        isen.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ImageIcon isenIcon  = new ImageIcon( this.getClass().getResource("boule_expo.jpg") );
+        JLabel isen         = new JLabel( isenIcon );
+        isen.setAlignmentX( Component.CENTER_ALIGNMENT );
         paneRight.add(isen);
-        // SCORE TEXTR
+
+        // SCORE TEXT
         JLabel scoreText = new JLabel("Score :");
         paneRight.add(scoreText);
+
         // SCORE VALUE
-        scoreText.setAlignmentX(Component.LEFT_ALIGNMENT);
         paneRight.add(this.score);
-        this.score.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         this.pack();
     }
 
-    public void setScore (int s) {
-        this.score.setText( Integer.toString(s) );
-        this.repaint();
-    }
-
     public void drawGrid() {
 
+        paneLeft.removeAll(); // enleve les anciennes boules
         M = new ElementZ_model();
+        do {                  // Enleve les familles au démarrage
+            M.delete_famille();
+            M.gravity();   // Fait descendre les boules
+            M.remplir();   // comble les trous
+            M.detect(); // marque en booleen les familles
+        }while( M.hasToClean() );
+        Score.getInstance().reset(); // Reset le score
+        updateScore();
 
         for(int i = 0; i< M.matrix.length; i++) {
             for(int j = 0; j< M.matrix.length; j++) {
 
-                grid[i][j] = new Boule(M.matrix[i][j]);
-
+                grid[i][j] = new Boule( M.matrix[i][j] );
                 paneLeft.add( (grid[i][j]).button );
 
                 // ON APPUIE SUR UNE BOULE
@@ -102,16 +107,13 @@ public class Window extends JFrame{
                     public void mouseClicked(MouseEvent e) {}
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        for (int i = 0; i < 8; i++) {
-                            for (int j = 0; j < 8; j++) {
+                        for (int i = 0; i < M.getSize(); i++) {
+                            for (int j = 0; j < M.getSize(); j++) {
                                 if ((grid[i][j]).button == e.getSource()){
                                     // On a la Boule en I et J
-                                    //System.out.println( grid[i][j].toString() );
                                     src.x = i;
                                     src.y = j;
-                                    //System.out.println( "from " + Integer.toString(src[0]) + " " + Integer.toString(src[1]) );
                                 }
-
                             }
                         }
                     }
@@ -121,43 +123,45 @@ public class Window extends JFrame{
                         int dy      = e.getY() -32;
                         int dxA     = Math.abs(dx) ;
                         int dyA     = Math.abs(dy);
-                        int seuil   = 40;
+                        int seuil   = 40; // seul de detection du mouvement
+                        dest.x = -1;
+                        dest.y = -1;
 
-                        //System.out.println( Integer.toString(dx) + ' ' + Integer.toString(dy) );
                         if( dxA > dyA && dyA <= seuil ){ // MOUVEMENT Horizontal
-                            System.out.print("Hor");
                             if(dx > 0){
-                                System.out.println(" droite");
                                 dest.x = src.x;
                                 dest.y = src.y + 1;
-                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
                             }
                             else{
-                                System.out.println(" gauche");
                                 dest.x = src.x;
                                 dest.y = src.y - 1;
-                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
                             }
                         }
                         else if( dyA > dxA && dxA <= seuil ){ // MOUVEMENT Vertical
-                            System.out.print("vert");
                             if(dy > 0){
-                                System.out.println(" bas");
                                 dest.x = src.x + 1;
                                 dest.y = src.y;
-                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
                             }
                             else{
-                                System.out.println(" haut");
                                 dest.x = src.x - 1;
                                 dest.y = src.y;
-                                //System.out.println( "to " + Integer.toString(dest[0]) + " " + Integer.toString(dest[1]) );
                             }
                         }
                         if( dest.x >= 0 && dest.y >= 0 && dest.x <= M.getSize() -1 && dest.y <= M.getSize() -1 ) {
+
                             M.permut(src.x, src.y, dest.x, dest.y);
                             updateGrid();
-                            while( M.cleanGrid() ){}
+                            M.detect(); // marque en booleen les familles
+
+                            do {
+                                M.delete_famille();
+                                M.gravity();   // Fait descendre les boules
+                                M.remplir();   // comble les trous
+                                M.detect(); // marque en booleen les familles
+                            }while( M.hasToClean() );
+
+                            updateGrid();
+                            updateScore();
                         }
                     }
                     @Override
@@ -173,7 +177,7 @@ public class Window extends JFrame{
     /**
      * Met a jour l'affichage en changant la couleur des boutons
      */
-    public void updateGrid() {
+    private void updateGrid() {
 
         for(int i = 0; i< M.matrix.length; i++) {
             for(int j = 0; j< M.matrix.length; j++) {
@@ -185,5 +189,9 @@ public class Window extends JFrame{
             }
         }
         paneLeft.updateUI();
+    }
+    private void updateScore(){
+        this.score.setText( (Score.getInstance()).getScore() );
+        this.score.updateUI();
     }
 }

@@ -21,7 +21,14 @@ public class Boule {
 
         this.color      = newColor;
         bouleIcon       = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
-        bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ this.color +".jpg"));
+
+        if(this.color   != 0) { // RESOUD LE PROBLEME DU HOVER SUR LA BOULE 0
+            bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_o_"+ this.color +".jpg"));
+        }
+        else {
+            bouleIconHover  = new ImageIcon(this.getClass().getResource("boule_"+ this.color +".jpg"));
+        }
+
         button.setIcon(bouleIcon);
         button.setRolloverIcon(bouleIconHover);
     }
